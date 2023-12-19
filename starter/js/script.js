@@ -95,6 +95,64 @@ function getDataFromApi(cityName) {
             }
             weatherData.push(extractedWeatherData)
         }
+        localStorage.setItem(cityName, JSON.stringify(weatherData))
+    })
+    .catch(error => {
+        allert('You have probably typed the wrong city name. Please try again.')
     })
 }
+
+searchHistoryEl.addEventListener('click', function(event) {
+    if(event.target.classList.contains('history-btn')) {
+        const location = event.target.textContent.trim()
+        const dataFromStorage = localStorage.getItem(location)
+        const weatherData = JSON.parse(dataFromStorage)
+
+        const currentWeatherHTML = `
+        <div class="card-body">
+            <h3 id="location-name" class="card-title">${location} ${weatherData[0].dateData}</h3>
+            <p id="current-temp"> class="card-text">Temp: <span>${weatherData[0].tempData}</span></p>
+            <p id="current-wind"> class="card-text">Wind: <span>${weatherData[0].windData}</span></p>
+            <p id="current-humidity"> class="card-text">Humidity: <span>${weatherData[0].humidityData}</span></p>
+        </div>
+        `
+
+        currentWeatherEL.innerHTML = currentWeatherHTML;
+
+        let weatherDataHTML = ``
+
+        for(let i = 0; i < weatherData.length; i) {
+            const singleWeatherCard = `
+            <div class="card single-forecast">
+                <div class="card-body">
+                    <h5 class="card-title forecast-date">${weatherData[i].dateData}</h5>
+                    <h5 class="card-title forecast-date">Image</h5>
+                    <!--<img src="" alt="weather-conditions">-->
+                    <p class="card-text forecast-temp">Temp: ${weatherData[i].tempData} °C</p>
+                    <p class="card-text forecast-wind">Wind: ${weatherData[i].windData} Km/hr</p>
+                    <p class="card-text forecast-humidity">Humidity: ${weatherData[i].humidityData} %</p>
+                </div>
+            </div>
+            `
+            weatherDataHTML += singleWeatherCard
+        }
+        console.log(weatherDataHTML)
+        forecastContainerEl.innerHTML = weatherDataHTML
+    }
+})
+
+function displaySearchHistory() {
+    const citiesInStorage = Object.keys(localStorage)
+    historyButtonsHTML += ``
+
+    if(citiesInStorage.length > 0) {
+        citiesInStorage.forEach(name =>{
+            historyButtonsHTML += `
+            <button class="history-btn">${name}</button>
+            `
+        })
+    }
+    searchFormEl.innerHTML = historyButtonsHTML 
+}
+displaySearchHistory()
 
